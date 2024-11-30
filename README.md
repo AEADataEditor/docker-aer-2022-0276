@@ -1,69 +1,64 @@
-# Docker image basic R image
+# Docker image basic Stata image with Julia
 
 ## Purpose
 
-Many R replication packages have dependencies, which sometimes include the specific version of R (in particular before/after release of v4).
 This Docker image is meant to isolate and stabilize that environment, and should be portable across
 multiple operating system, as long as [Docker](https://docker.com) is available.
 
-## Build
+> To learn more about the use of containers for research reproducibility, see [Carpentries' docker-introduction](https://carpentries-incubator.github.io/docker-introduction/index.html). For commercial services running containers, see [codeocean.com](https://codeocean.com), [gigantum](https://gigantum.com/), or any of the cloud service providers. For an academic project using containers, see [Whole Tale](https://wholetale.org/).
 
-### Adjust the needed packages
+> NOTE: The image created by these instructions contains binary code that is &copy; Stata. Permission was granted by Stata to Lars Vilhuber to post these images, without the license. A valid license is necessary to build and use these images. 
 
-See the [setup.R](setup.R) file, and update accordingly.
+## Requirements
 
-> WARNING: not all packages might build, depending on whether the R base image has the relevant libraries. You might want to change R base image, or switch to another image from [rocker](https://hub.docker.com/u/rocker).
+You need a Stata license to run the image. If rebuilding, may need Stata license to build the image.
 
-### Setup info
+### Where should you put the Stata license
 
-Set the `TAG` and `IMAGEID` accordingly.
+In the documentation below, we will use a (bash) environment variable to abstract from the actual location of the Stata license. This has been tested on MacOS and Linux, and it *should* work using Git Bash on Windows. Comments welcome.
 
-```
-TAG=v$(date +%F)
-MYIMG=aer-9999-8888
-MYHUBID=aeadataeditor
-```
-### Build the image
+## Dockerfile
 
-```
-docker build  . -t $MYIMG:$TAG
-```
-or if using the newer build system 
-```
-DOCKER_BUILDKIT=1 docker build . -t $MYIMG:$TAG
+The [Dockerfile](Dockerfile) contains the build instructions. See <https://github.com/AEADataEditor/docker-stata> for more information on the base image used here.
+
+Edit `.myconfig.sh` before building the image. Then use
+
+```bash
+./build.sh
 ```
 
-## Publish the image
+to build the image.
 
-The resulting docker image can be uploaded to [Docker Hub](https://hub.docker.com/), if desired.
-
-```
-docker push $MYHUBID/${MYIMG}:$TAG
-```
 
 ## Using the image
 
-If using a pre-built image on [Docker Hub](https://hub.docker.com/repository/docker/larsvilhuber/):
+For all the subsequent `docker run` commands, we will use similar environment variables:
 
 ```
-docker run -it --rm $MYHUBID/${MYIMG}:$TAG
+VERSION=18
+TAG=latest
+MYHUBID=aeadataeditor
+MYIMG=aer-2022-0276
 ```
 
-If using the image you just created:
+and either
 
-```
-docker run -it --rm $MYHUBID/${MYIMG}:$TAG
-```
-
-Somewhat more sophisticated, if you are in a project directory (for instance, the replication package you just downloaded), you can access it directly within the image as follows:
-
-```
-docker run -it --rm -v $(pwd)/subdir:/code -w /code $MYHUBID/${MYIMG}:$TAG
+``` 
+STATALIC="$(pwd)/stata.lic.${VERSION}"
 ```
 
+or
 
-You can now start to run code.
+```
+STATALIC="$(find $HOME/Dropbox/ -name stata.lic.$VERSION | tail -1)"
+```
 
-## NOTE
+where again, the various forms of `STATALIC` are meant to capture the location of the `stata.lic` file (in my case, it is called `stata.lic.18`, but in your case, it might be simply `stata.lic`). 
 
-This entire process could be automated, using [Travis-CI](https://docs.travis-ci.com/user/docker/#pushing-a-docker-image-to-a-registry) or [Github Actions](https://github.com/marketplace/actions/build-and-push-docker-images). Not done yet.
+### Convenience script
+
+Assuming these scripts are in the root directory of the replication package, the following will work provide a shell inside the container:
+
+```bash
+./run_docker.sh
+```
