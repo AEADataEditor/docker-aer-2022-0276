@@ -4,9 +4,9 @@ PWD=$(pwd)
 . ${PWD}/.myconfig.sh
 STATALIC="$(pwd)/stata.lic.${VERSION}"
 # Search elsewhere
-[[ -z $STATALIC ]] && STATALIC="$(find $HOME/Dropbox/ -name stata.lic.$VERSION | tail -1)"
+[[ ! -f $STATALIC ]] && STATALIC="$(find $HOME/Dropbox/ -name stata.lic.$VERSION | tail -1)"
 # Still empty? Exit
-[[ -z $STATALIC ]] && echo "No stata.lic file found" && exit 1
+[[ ! -f $STATALIC ]] && echo "No stata.lic file found" && exit 1
 
 docker pull $dockerrepo
 
