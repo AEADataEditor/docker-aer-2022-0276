@@ -1,5 +1,6 @@
 # Docker image basic Stata image with Julia
 
+
 ## Purpose
 
 This Docker image is meant to isolate and stabilize that environment, and should be portable across
@@ -12,6 +13,8 @@ multiple operating system, as long as [Docker](https://docker.com) is available.
 ## Requirements
 
 You need a Stata license to run the image. If rebuilding, may need Stata license to build the image.
+
+> The currently used image requires a StataNow license. You may need to rebuild it if you only have a Stata 18 or other permanent license.
 
 ### Where should you put the Stata license
 
@@ -27,7 +30,7 @@ Edit `.myconfig.sh` before building the image. Then use
 ./build.sh
 ```
 
-to build the image.
+to build the image. This will copy in the Stata components, and then install the Julia components based on the provided `Manifest.toml`. Subsequent requests to run the image should use those components without further installation, but this has not always worked, feedback is requested.
 
 
 ## Using the image
@@ -62,3 +65,23 @@ Assuming these scripts are in the root directory of the replication package, the
 ```bash
 ./run_docker.sh
 ```
+
+```bash
+docker run \
+   -v "${STATALIC}":/usr/local/stata/stata.lic \
+   -v $WORKSPACE:/project \
+   --rm \
+   -it \
+   --user statauser \
+   --entrypoint /bin/bash \
+   $dockerrepo
+```
+
+The script will
+
+- map the Stata license into the right location within the image
+- map the current directory into the image at `/project`
+- ensure the user is set to `statauser` inside the image
+- modify the `entrypoint` to the Bash shell, and provide an interactive shell
+
+The script is known to work on MacOS and Linux (including WSL). You may need to make adjustments on Windows, or on systems where `docker` is not the user-accessible Docker command. 
