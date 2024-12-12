@@ -24,6 +24,7 @@ fi
 $dockerbin run \
    -v "${STATALIC}":/usr/local/stata/stata.lic \
    -v $WORKSPACE:/project \
+   -w /project \
    --rm \
    -it \
    --user statauser \

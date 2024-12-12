@@ -70,6 +70,7 @@ Assuming these scripts are in the root directory of the replication package, the
 docker run \
    -v "${STATALIC}":/usr/local/stata/stata.lic \
    -v $WORKSPACE:/project \
+   -w /project \
    --rm \
    -it \
    --user statauser \
@@ -80,7 +81,7 @@ docker run \
 The script will
 
 - map the Stata license into the right location within the image
-- map the current directory into the image at `/project`
+- map the current directory into the image at `/project` and sets the working directory to that "volume"
 - ensure the user is set to `statauser` inside the image
 - modify the `entrypoint` to the Bash shell, and provide an interactive shell
 
