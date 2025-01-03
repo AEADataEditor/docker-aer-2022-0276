@@ -1,23 +1,19 @@
 #!/bin/bash
 PWD=$(pwd)
+dockerbin=$(which docker1 2>/dev/null)
+[[ -z $dockerbin ]] && dockerbin=$(which docker)
+[[ -z $dockerbin ]] && exit 2
 
 . ${PWD}/.myconfig.sh
 STATALIC="$(pwd)/stata.lic.${VERSION}"
 # Search elsewhere
-[[ -z $STATALIC ]] && STATALIC="$(find $HOME/Dropbox/ -name stata.lic.$VERSION | tail -1)"
+[[ ! -f $STATALIC ]] && STATALIC="$(find $HOME/Dropbox/ -name stata.lic.$VERSION | tail -1)"
 # Still empty? Exit
-[[ -z $STATALIC ]] && echo "No stata.lic file found" && exit 1
+[[ ! -f  $STATALIC ]] && echo "No stata.lic file found" && exit 1
 
-docker pull $dockerrepo
+$dockerbin pull $dockerrepo
 
-if [[ $? == 1 ]]
-then
-  ## maybe it's local only
-  docker image inspect $dockerrepo> /dev/null
-  [[ $? == 0 ]] && BUILD=no
-fi
-
-docker run \
+$dockerbin run \
    -v "${STATALIC}":/usr/local/stata/stata.lic \
    -v $WORKSPACE:/project \
    --rm \
