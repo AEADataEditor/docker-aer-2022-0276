@@ -31,6 +31,14 @@ ARG JULIAVER=1.5.3
 RUN  curl -fsSL https://install.julialang.org | sh -s -- -y &&\
      /home/statauser/.juliaup/bin/juliaup add $JULIAVER &&\
      /home/statauser/.juliaup/bin/juliaup default $JULIAVER
+COPY .bashrc /home/statauser/.bashrc
+RUN mkdir /home/statauser/juliaproj
+WORKDIR /home/statauser/juliaproj
+COPY *toml /home/statauser/juliaproj
+COPY *jl   /home/statauser/juliaproj
+RUN . /home/statauser/.bashrc &&\
+    julia init.jl
+WORKDIR /home/statauser
 
 VOLUME "/project"
 

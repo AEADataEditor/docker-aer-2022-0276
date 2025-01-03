@@ -1,11 +1,12 @@
 #!/bin/bash
 PWD=$(pwd)
-dockerbin=$(which docker1 2>/dev/null)
-[[ -z $dockerbin ]] && dockerbin=$(which docker)
-[[ -z $dockerbin ]] && exit 2
 
 . ${PWD}/.myconfig.sh
 STATALIC="$(pwd)/stata.lic.${VERSION}"
+# Adjust for docker1 on BioHPC
+dockerbin=$(which docker1)
+[[ -z $dockerbin ]] && dockerbin=$(which docker)
+
 # Search elsewhere
 [[ ! -f $STATALIC ]] && STATALIC="$(find $HOME/Dropbox/ -name stata.lic.$VERSION | tail -1)"
 # Still empty? Exit
@@ -16,6 +17,7 @@ $dockerbin pull $dockerrepo
 $dockerbin run \
    -v "${STATALIC}":/usr/local/stata/stata.lic \
    -v $WORKSPACE:/project \
+   -w /project \
    --rm \
    -it \
    --user statauser \
