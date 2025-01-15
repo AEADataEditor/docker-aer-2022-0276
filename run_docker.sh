@@ -8,6 +8,7 @@ dockerbin=$(which docker1)
 [[ -z $dockerbin ]] && dockerbin=$(which docker)
 
 # Search elsewhere
+[[ ! -f $STATALIC ]] && STATALIC="$(pwd)/.stata.lic"
 [[ ! -f $STATALIC ]] && STATALIC="$(find $HOME/Dropbox/ -name stata.lic.$VERSION | tail -1)"
 # Still empty? Exit
 [[ ! -f  $STATALIC ]] && echo "No stata.lic file found" && exit 1
